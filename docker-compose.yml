@@ -1,0 +1,33 @@
+web:
+  build: ./app
+  restart: always
+  links:
+    - neo4j
+    - elastic
+  volumes:
+    - ./app:/usr/src/app
+  environment:
+    - DB_HOST=http://neo4j:7474
+    - ES_HOST=http://elastic:9200
+neo4j:
+  image: neo4j
+  environment:
+    - NEO4J_AUTH=none
+  ports:
+    - "7474:7474"
+elastic:
+  image: elasticsearch
+  restart: always
+  ports:
+    - "9200:9200"
+  volumes:
+    - ./esdata:/data
+kibana:
+  image: kibana
+  restart: always
+  ports:
+    - "5601:5601"
+  links:
+    - elastic
+  environment:
+    - ELASTICSEARCH_URL=http://elastic:9200
